@@ -1,0 +1,3 @@
+<resources>
+    <string name="xposed_description">解除截图与录屏限制，禁用截图与录屏检测，并隐藏OPPO互联投屏显示</string>
+</resources>

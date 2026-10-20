@@ -1,0 +1,3 @@
+<resources>
+    <string name="xposed_description">解除截图限制，并禁用截图检测</string>
+</resources>

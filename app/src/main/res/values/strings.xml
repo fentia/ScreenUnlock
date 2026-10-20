@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">屏幕自由</string>
+    <string name="xposed_description">解除截图限制，并隐藏投屏显示</string>
+</resources>
