@@ -4,7 +4,7 @@
 
 ## 关于原仓库
 
-本项目基于 [LSPosed/DisableFlagSecure](https://github.com/LSPosed/DisableFlagSecure)（现名 Enable Screenshot）二次开发，遵循上游的 GPL-3.0 license。
+本项目基于 [LSPosed/DisableFlagSecure](https://github.com/LSPosed/DisableFlagSecure)（现名 Enable Screenshot）二次开发，遵循上游的[GNU GPL v3](LICENSE) 。
 
 上游解决的是「内容能不能被截到」：解除 `FLAG_SECURE`、强制捕获安全图层、屏蔽各家 ROM 的截图拦截判断。本项目保留其全部能力，并补充了一项上游没有覆盖的方向——「屏幕正在共享」这件事本身的可观测性。
 
@@ -75,6 +75,5 @@ APK 输出在 `app/build/outputs/apk/`。仓库的 GitHub Actions 会在 push �
 
 ## 许可
 
-[GPL-3.0](LICENSE)  
-本项目保留上游的 LICENSE 与版权声明  
-上游版权归 LSPosed 贡献者所有
+[GNU GPL v3](LICENSE)  
+**本项目保留上游的 LICENSE 与版权声明，上游版权归 LSPosed 贡献者所有**
