@@ -28,6 +28,7 @@ public class ScreenUnlock extends XposedModule {
     private static final String OPLUS_APPPLATFORM = "com.oplus.appplatform";
     private static final String OPLUS_SCREENSHOT = "com.oplus.screenshot";
     private static final String OPLUS_CAST = "com.oplus.cast";
+    private static final String OPLUS_SCREENRECORDER = "com.oplus.screenrecorder";
     private static final String FLYME_SYSTEMUIEX = "com.flyme.systemuiex";
     private static final String MIUI_SCREENSHOT = "com.miui.screenshot";
 
@@ -181,6 +182,7 @@ public class ScreenUnlock extends XposedModule {
                         log(Log.ERROR, TAG, "hook ScreenshotHardwareBuffer failed", t);
                     }
                 }
+                hookOplusHardwareBuffer(classLoader);
             case SYSTEMUI:
             case MIUI_SCREENSHOT:
                 if (OPLUS_APPPLATFORM.equals(packageName) || OPLUS_SCREENSHOT.equals(packageName) ||
@@ -193,6 +195,10 @@ public class ScreenUnlock extends XposedModule {
                         log(Log.ERROR, TAG, "hook ScreenCapture failed", t);
                     }
                 }
+                break;
+            case OPLUS_SCREENRECORDER:
+                hookOplusHardwareBuffer(classLoader);
+                hookOplusInfoMonitor(classLoader);
                 break;
             default:
                 try {
@@ -448,6 +454,42 @@ public class ScreenUnlock extends XposedModule {
             args[0] = -1;
             return chain.proceed(args);
         });
+    }
+
+    // Force the Oplus private ScreenshotHardwareBuffer to report no secure layers
+    private void hookOplusHardwareBuffer(ClassLoader classLoader) {
+        try {
+            var clazz = classLoader.loadClass("com.oplus.screenshot.OplusScreenCapture$ScreenshotHardwareBuffer");
+            var method = clazz.getDeclaredMethod("containsSecureLayers");
+            hookE(method).intercept(chain -> false);
+        } catch (ClassNotFoundException | NoSuchMethodException ignored) {
+        } catch (Throwable t) {
+            module.log(Log.ERROR, TAG, "hook OplusHardwareBuffer failed", t);
+        }
+    }
+
+    // Drop secure-layer SF event registration coming from the Oplus screen recorder
+    private void hookOplusInfoMonitor(ClassLoader classLoader) {
+        try {
+            var clazz = classLoader.loadClass("com.oplus.display.OplusInfoMonitor");
+            for (var method : clazz.getDeclaredMethods()) {
+                if (!"registerSfEvent".equals(method.getName())) continue;
+                hookE(method).intercept(chain -> {
+                    var args = chain.getArgs();
+                    if (args.size() <= 2) return chain.proceed();
+                    var listener = args.get(0);
+                    var listenerName = listener == null ? "" : listener.getClass().getName();
+                    if ("com.oplus.screenrecordersecure".equals(args.get(2))
+                            && listenerName.startsWith("com.oplus.screenrecorder.")) {
+                        return null;
+                    }
+                    return chain.proceed();
+                });
+            }
+        } catch (ClassNotFoundException ignored) {
+        } catch (Throwable t) {
+            module.log(Log.ERROR, TAG, "hook OplusInfoMonitor failed", t);
+        }
     }
 
     private void hookOplus(ClassLoader classLoader) throws ClassNotFoundException {
