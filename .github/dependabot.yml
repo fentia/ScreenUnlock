@@ -1,24 +1,52 @@
 version: 2
+
 updates:
-  - package-ecosystem: gradle
+  - package-ecosystem: "gradle"
     directory: "/"
+    target-branch: "main"
     schedule:
-      interval: daily
+      interval: "weekly"
+      day: "monday"
       time: "21:00"
-    open-pull-requests-limit: 10
-    target-branch: main
-    registries:
-      - maven-google
-      - gralde-plugin
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "gradle"
+    groups:
+      androidx:
+        patterns:
+          - "androidx.*"
+        update-types:
+          - "minor"
+          - "patch"
+      build-toolchain:
+        patterns:
+          - "com.android.*"
+          - "org.jetbrains.kotlin*"
+          - "gradle*"
+        update-types:
+          - "minor"
+          - "patch"
+      other-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-
-registries:
-  maven-google:
-    type: maven-repository
-    url: "https://dl.google.com/dl/android/maven2/"
-  gralde-plugin:
-    type: maven-repository
-    url: "https://plugins.gradle.org/m2/"
+      day: "monday"
+      time: "21:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 3
+    groups:
+      actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
